@@ -1,0 +1,115 @@
+//---------------------------------------------------------------------------------------------//
+//======================================= custom mixins =======================================//
+//---------------------------------------------------------------------------------------------//
+
+//- parent -//
+@mixin parent() {
+  max-width: var(--parent) !important;
+  width: 100%;
+  margin-inline: auto;
+}
+
+//- subparent -//
+@mixin subparent() {
+  max-width: var(--subparent) !important;
+  width: 100%;
+  margin-inline: auto;
+}
+
+//- pixel border -//
+@mixin pixelBorder() {
+  --c-size: 4.5px;
+  
+  padding: var(--c-size);
+  position: relative;
+  isolation: isolate;
+  clip-path: $clip-path;
+  
+  &::before, &::after {
+    content: "" !important;
+    position: absolute !important;
+    opacity: 1 !important;
+    z-index: -1 !important;
+    clip-path: $clip-path;
+    inset: 0;
+  }
+  
+  // border
+  &::before {
+    background-color: var(--accent) !important;
+  }
+  
+  // body
+  &::after {
+    inset: var(--c-size);
+    background-color: var(--bg);
+  }
+}
+
+//- buttons -//
+@mixin btn() {
+  color: var(--primary)!important;
+  font-weight: 700!important;
+  font-family: var(--font1)!important;
+  background-color: var(--tertiary)!important;
+  border-radius: 5px!important;
+
+  --c: var(--primary)!important;
+  --fw: 700!important;
+  font-family: var(--font1)!important;
+  --bg: var(--tertiary)!important;
+  border-radius: 5px!important;
+}
+
+//- cards -//
+@mixin card() {
+  background-color: var(--primary)!important;
+  border-radius: 15px!important;
+  width: 100%;
+  max-width: 400px!important;
+  min-width: 300px!important;
+  box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.1)!important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;  
+  padding: 20px 15px 20px 15px;
+
+  @include media(max, 560px){
+    width: 300px!important;
+    max-width: 300px!important;
+  }
+}
+
+
+
+//---------------------------------------------------------------------------------------------//
+//====================================== custom classes =======================================//
+//---------------------------------------------------------------------------------------------//
+
+//- limit size -//
+.parent {
+  @include parent;
+}
+.subparent {
+  @include subparent;
+}
+.margin_global {
+  padding-inline: var(--margin-global);
+}
+.margin_globalmobile {
+  @include media(max, small) {padding-inline: var(--margin-global) !important}
+}
+
+
+//- buttons -//
+.btn {
+  @include btn;
+}
+
+
+//- cards -//
+.card {
+  @include card;
+}
+
