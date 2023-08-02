@@ -1,8 +1,11 @@
 <template>
-  <v-dialog v-model="modalConnect" content-class="modal-connect divcol relative isolate">
+  <v-dialog
+    v-model="modalConnect"
+    content-class="modal-connect divcol relative isolate"
+  >
     <aside class="space">
       <span class="h9_em">Connect Wallet</span>
-      
+
       <v-btn icon @click="modalConnect = false">
         <v-icon size="1.5em">mdi-close</v-icon>
       </v-btn>
@@ -10,8 +13,11 @@
 
     <v-sheet class="grid" color="transparent">
       <v-btn plain @click="connectMetamask()">
-        <img src="~/assets/sources/logos/metamask-icon.svg" alt="metamask logo">
-        
+        <img
+          src="~/assets/sources/logos/metamask-icon.svg"
+          alt="metamask logo"
+        />
+
         <div class="divcol astart" style="gap: 5px">
           <span class="h12_em bold">metamask</span>
           <span class="h13_em">metamask.org</span>
@@ -23,11 +29,11 @@
 
 <script>
 export default {
-  name: "ConnectModal",
+  name: 'ConnectModal',
   data() {
     return {
-      modalConnect: false,
-    };
+      modalConnect: false
+    }
   },
 
   mounted() {
@@ -35,83 +41,76 @@ export default {
   },
 
   methods: {
-    async connectMetamask(){
+    async connectMetamask() {
       if (typeof window.ethereum !== 'undefined') {
-        console.log('MetaMask is installed!');
+        console.log('MetaMask is installed!')
         await this.getAccount()
-      }else{
-        console.log('Instala metamask')
+      } else {
+        console.log('Por favor instala la extensión de Metamask')
       }
     },
 
     async getAccount() {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+      const accounts = await window.ethereum
+        .request({ method: 'eth_requestAccounts' })
         .catch((err) => {
           if (err.code === 4001) {
             // EIP-1193 userRejectedRequest error
             // If this happens, the user rejected the connection request.
-            console.log('Please connect to MetaMask.');
+            console.log('Please connect to MetaMask.')
           } else {
-            console.error(err);
+            console.error(err)
           }
-        });
-      const account = accounts[0];
-      localStorage.setItem("isLogged", window.ethereum.isConnected())
-      localStorage.setItem("account", account)
+        })
+      const account = accounts[0]
+      localStorage.setItem('isLogged', window.ethereum.isConnected())
+      localStorage.setItem('account', account)
     },
 
-    getChainId(){
+    getChainId() {
       const chainId = window.ethereum.request({ method: 'eth_chainId' })
 
-      if(chainId !== 56){
-        this.$alert("error", {desc: 'Agregue la red de BNB'})
-        // this.changeUserCurrentChain()
+      if (chainId !== 56) {
+        this.$alert('error', { desc: 'Agregue la red de BNB' })
+        this.changeUserCurrentChain()
       }
     },
 
+    changeUserCurrentChain: async () => {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x38' }]
+        })
 
-    // changeUserCurrentChain: async () => {
+        window.location.reload()
+      } catch (switchError) {
+        if (switchError.code === 4902) {
 
-    //   try {
-    //     await window.ethereum.request({
-    //       method: 'wallet_switchEthereumChain',
-    //       params: [{ chainId: '0x38' }],
-    //     });
-        
-    //     window.location.reload();
-    //   } catch (switchError) {
-    //     // The network has not been added to MetaMask
-    //     if (switchError.code === 4902) {
-    //       //
-    //     }
-    //     this.addTestnetToMetamask()
-    //   }
-    // },
-    // async addTestnetToMetamask() {
-    //     console.log('hOLA')
-    //     try {
-    //       await window.ethereum.request({
-    //       method: 'wallet_addEthereumChain',
-    //       params: [
-    //           {
-    //             chainId: '0x38', 
-    //             chainName:'BNB Smart Chain Mainnett',
-    //             rpcUrls:['https://bsc-dataseed.binance.org'],                   
-    //             blockExplorerUrls:['https://bscscan.com'],  
-    //             nativeCurrency: { 
-    //               symbol:'BNB',   
-    //               decimals: 18
-    //             }     
-    //           }
-    //         ]
-    //     });
-    //   } catch (err) {
-
-    //   } 
-    //   },
-      
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x38',
+                  chainName: 'BNB Smart Chain Mainnett',
+                  rpcUrls: ['https:bsc-dataseed.binance.org'],
+                  blockExplorerUrls: ['https:bscscan.com'],
+                  nativeCurrency: {
+                    symbol: 'BNB',
+                    decimals: 18
+                  }
+                }
+              ]
+            })
+          } catch (err) {
+            
+          }
+        }
+      }
+    }
   }
-};
+}
 </script>
 
 <style lang="scss">
@@ -124,33 +123,37 @@ export default {
   --p: 30px;
   --tt: capitalize;
   gap: 20px;
-  
+
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 2px;
     background-clip: content-box, border-box;
-    background-image: linear-gradient(var(--bg),var(--bg)),
-      linear-gradient(135deg, rgba($primary,.2), rgba($accent,.2));
+    background-image: linear-gradient(var(--bg), var(--bg)),
+      linear-gradient(135deg, rgba($primary, 0.2), rgba($accent, 0.2));
     z-index: -1;
   }
 
-  i {color: hsl(225 225% 225% / .5) !important}
+  i {
+    color: hsl(225 225% 225% / 0.5) !important;
+  }
 
   .v-sheet.grid {
-    @include media(min, 500px) {--gtc: 1fr 1fr}
+    @include media(min, 500px) {
+      --gtc: 1fr 1fr;
+    }
     gap: 20px;
     .v-btn {
       --fs: 20px;
       width: 100%;
       min-height: 70px;
       border-radius: 10px;
-      background-color: hsl(0 0% 0% / .2);
-      transition: .2s $ease-return;
+      background-color: hsl(0 0% 0% / 0.2);
+      transition: 0.2s $ease-return;
       &:hover {
-        background-color: hsl(0 0% 0% / .4);
+        background-color: hsl(0 0% 0% / 0.4);
         transform: translateY(-5px) !important;
       }
       &__content {
@@ -161,7 +164,7 @@ export default {
           --of: cover;
         }
         span + span {
-          --c: hsl(225 225% 225% / .5);
+          --c: hsl(225 225% 225% / 0.5);
         }
       }
     }

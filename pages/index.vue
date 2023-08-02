@@ -152,6 +152,10 @@
 </template>
 
 <script>
+/* import faucetAbi from '~/static/ ABIS/infinity_blocks_abi.json'
+const Web3 = require('web3')
+const web3 = new Web3(window.ethereum);
+ */
 export default {
   name: "HomePage",
   data() {
@@ -168,7 +172,7 @@ export default {
   methods: {
     alertConnect(){
       return this.$alert('error',{desc:"Su wallet ya esta conectada"})
-    }
+    },
   }
 };
 </script>
