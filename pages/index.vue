@@ -4,7 +4,7 @@
       <v-col cols="12" class="center">
         <v-card class="card" style="background-color: var(--secondary)!important;">
             <h2 class="p">WALLET</h2>
-            <span>debrybuiejndo3ndg372898312exw</span>
+            <span>{{wallet}}</span>
         </v-card>
       </v-col>
 
@@ -13,7 +13,7 @@
       <v-col cols="12" class="center">
         <v-card class="card">
           <img src="~/assets/sources/icons/Bloque.svg" alt="Bloque" class="mb-2">
-          <h2 class="p">21 BLOCKS</h2>
+          <h2 class="p">{{ getBLKS() }} BLOCKS</h2>
           <span>$1050</span>
         </v-card>
       </v-col>
@@ -35,7 +35,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
-          <span>$74.65</span>
+          <span>${{ getROI() }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -152,15 +152,17 @@
 </template>
 
 <script>
-/* import faucetAbi from '~/static/ ABIS/infinity_blocks_abi.json'
-const Web3 = require('web3')
+import faucetAbi from '~/static/ABIS/infinity_blocks_abi.json';
+const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
- */
+const infinityBlocksAddres = '0x2A97A853261e6338a0663f17e81fC3d6dF9e4f41';
+
 export default {
   name: "HomePage",
   data() {
     return {
       active_slider: 60,
+      wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet"),
     }
   },
   head() {
@@ -169,9 +171,68 @@ export default {
       title,
     }
   },
+  mounted() {
+    this.getAccount();
+    if (localStorage.getItem("wallet") !== null) {
+      this.updateWallet();
+    }
+  },
   methods: {
+    async getAccount() {
+      const accounts = await window.ethereum
+        .request({ method: 'eth_requestAccounts' })
+        .catch((err) => {
+          if (err.code === 4001) {
+            // EIP-1193 userRejectedRequest error
+            // If this happens, the user rejected the connection request.
+            console.log('Please connect to MetaMask.')
+          } else {
+            console.error(err)
+          }
+        })
+      const account = accounts[0]
+      localStorage.setItem('isLogged', window.ethereum.isConnected())
+      localStorage.setItem('account', account)
+    },
+    updateWallet() {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        const currentAddress = accounts[0];
+        currentAddress === undefined ? localStorage.removeItem("wallet") : localStorage.setItem("wallet", currentAddress);
+        window.location.reload();
+      });
+    },
     alertConnect(){
       return this.$alert('error',{desc:"Su wallet ya esta conectada"})
+    },
+    async getBLKS() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const blks = await tokenContract.methods.blokes().send()
+      return blks
+    },
+    async getROI() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const ROI = await tokenContract.methods.adRoi().send()
+      return ROI
+    },
+    async withdrawBonoResidual() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const blks = await tokenContract.methods.Withdraw().call()
+      return blks
+    },
+    async getAdInfinity() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const blks = await tokenContract.methods.adInfinity().send()
+      return blks
+    },
+    async withdrawBonoReferidos() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const blks = await tokenContract.methods.withdraw2().send()
+      return blks
+    },
+    async getDepositos() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const blks = await tokenContract.methods.depositos().send()
+      return blks
     },
   }
 };
