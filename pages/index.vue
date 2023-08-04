@@ -36,7 +36,7 @@
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
           <span>${{ roi | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
+          <v-btn class="btn mt-3" @click="withdrawROI()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -45,7 +45,7 @@
           <img src="~/assets/sources/icons/residual.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO RESIDUAL</h2>
           <span>${{ bonoResidual | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
+          <v-btn class="btn mt-3" @click="withdrawBonoResidual()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -54,7 +54,7 @@
           <img src="~/assets/sources/icons/Referido.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO REFERIDOS</h2>
           <span>${{ bonoReferidos | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
+          <v-btn class="btn mt-3" @click="withdrawBonoReferidos()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -186,7 +186,7 @@ import contractAbi from '~/static/ABIS/infinity_blocks_abi.json';
 const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
 const infinityBlocksAddres = '0x2A97A853261e6338a0663f17e81fC3d6dF9e4f41';
-const walletPruebas = '0x981374dE858078c0be8c0Bb51c4cDCe6393a7405'
+// const walletPruebas = '0x981374dE858078c0be8c0Bb51c4cDCe6393a7405'
 
 export default {
   name: "HomePage",
@@ -302,25 +302,25 @@ export default {
       }
     },
     
-    async withdrawBonoResidual() {
+    async withdrawROI() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        await tokenContract.methods.Withdraw(localStorage.getItem("wallet")).send({from: localStorage.getItem("wallet")})
+        await tokenContract.methods.withdraw().send({from: localStorage.getItem("wallet")})
       } catch (error) {
         console.log(error)
       }
     },
 
-    async withdrawBonoReferidos() {
+    async withdrawBonoResidual() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const bonoReferidos = await tokenContract.methods.withdraw2(localStorage.getItem("wallet")).send({from: localStorage.getItem("wallet")})
-      return bonoReferidos
+      await tokenContract.methods.withdraw2().send({from: localStorage.getItem("wallet")})
+
     },
 
-    async withdrawTeam() {
+    async withdrawReferidos() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const depositos = await tokenContract.methods.withdrawTeam(localStorage.getItem("wallet")).send({from: localStorage.getItem("wallet")})
-      return depositos
+      await tokenContract.methods.withdrawTeam().send({from: localStorage.getItem("wallet")})
+
     },
 
     async getDepositos() {
