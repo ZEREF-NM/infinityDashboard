@@ -30,9 +30,9 @@
       </v-col>
     </v-row>
 
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important;">
+    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; max-height: 740px;">
       <v-col cols="12" class="center">
-        <v-card class="card">
+        <v-card class="card" style="max-height: 215px!important;">
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
           <span>${{ roi | numericFormat(numericFormatConfig) }}</span>
