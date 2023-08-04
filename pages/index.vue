@@ -83,7 +83,7 @@
         <v-card v-show="item.monto" class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
             <div class="div-blue">
               <div class="divrow center" style="gap: 10px; max-height: 40px;">
-                <h2 style="font-size: 16px!important;">{{item.monto}} BLKS ($1000)</h2>
+                <h2 style="font-size: 16px!important;">{{item.monto}} BLKS (${{ valorBLKS }})</h2>
                 <div class="vertical"></div>
                 <h2 style="font-size: 16px!important;">{{item.estado}}</h2>
               </div>
@@ -133,6 +133,7 @@ export default {
       bonoReferidos: 0,
       bonoResidual: 0,
       active_slider: 60,
+      valorBLKS: 0,
       depositos: [],
       wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet").substring(1, 20),
     }
@@ -168,6 +169,7 @@ export default {
       const account = accounts[0]
       localStorage.setItem('isLogged', window.ethereum.isConnected())
       localStorage.setItem('wallet', account)
+      window.location.reload();
     },
     updateWallet() {
       window.ethereum.on('accountsChanged', (accounts) => {
@@ -241,36 +243,40 @@ export default {
     },
 
     async withdrawBonoResidual() {
-      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      await tokenContract.methods.withdraw2().send({from: localStorage.getItem("wallet")})
-
+      try {
+        const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+        await tokenContract.methods.withdraw2().send({from: localStorage.getItem("wallet")})
+      } catch (error) {
+        console.log(error)
+      }
     },
 
     async withdrawReferidos() {
-      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      await tokenContract.methods.withdrawTeam().send({from: localStorage.getItem("wallet")})
+      try {
+        const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+        await tokenContract.methods.withdrawTeam().send({from: localStorage.getItem("wallet")})
+      } catch (error) {
+        console.log(error)
+      }
 
     },
 
     async getDepositos() {
-      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const historialDepositos = await tokenContract.methods.depositos( localStorage.getItem("wallet"), true).call({from:  localStorage.getItem("wallet")})
-      console.log(historialDepositos)
-      console.log("-----------historialDepositos")
-      console.log("antes del for")
-      for(let i = historialDepositos[0].length ; i >= historialDepositos[0].length-9; i--) {
-        const monto = historialDepositos[0][i] / Math.pow(10, 18)
-        const tiempo = new Date(historialDepositos[1][i] * 1000)
-        const estado = historialDepositos[2][i] ? "ACTIVE" : "INACTIVE"
-        const data = {monto, tiempo, estado}
-        console.log(monto,"monto", tiempo,"tiempo", estado,"estado","assdadasdas")
-        this.depositos.push(data);
+      try {
+        const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+        const historialDepositos = await tokenContract.methods.depositos( localStorage.getItem("wallet"), true).call({from:  localStorage.getItem("wallet")})
+        for(let i = historialDepositos[0].length ; i >= historialDepositos[0].length-9; i--) {
+          const monto = historialDepositos[0][i] / Math.pow(10, 18)
+          const tiempo = new Date(historialDepositos[1][i] * 1000)
+          const estado = historialDepositos[2][i] ? "ACTIVE" : "INACTIVE"
+          const data = {monto, tiempo, estado}
+          this.depositos.push(data);
+        }
+      } catch (error) {
+        console.log(error)
       }
-      console.log("despues del for")
-      console.log(this.depositos)
-      console.log("-------------- depositos")
+
     },
-    
     
   }
 };
