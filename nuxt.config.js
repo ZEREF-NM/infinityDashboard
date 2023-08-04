@@ -153,7 +153,7 @@ export default {
 
   // Router property -  https://nuxtjs.org/docs/2.x/features/file-system-routing#the-router-property
   router: {
-    base: development ? '/infinity-blocks/' : '/',
+    base: development ? '/infinity-blocks/' : '/infinity-blocks-dashboard/',
     // middleware: ['route-validator'],
   },
 
@@ -164,7 +164,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    publicPath: development ? '/infinity-blocks/' : '/',
+    publicPath: development ? '/infinity-blocks-dashboard/' : '/infinity-blocks-dashboard/',
     // TODO: read about this to fix it.
     // plugins: [
     //   new webpack.ProvidePlugin({
