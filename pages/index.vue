@@ -75,13 +75,12 @@
     <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; align-items: flex-start;">
 
       <v-col 
-      v-show = "registered"
       v-for="item in depositos"
       :key="item.fecha"
       cols="12"
       class="center"
       >
-        <v-card class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
+        <v-card v-show="item.monto" class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
             <div class="div-blue">
               <div class="divrow center" style="gap: 10px; max-height: 40px;">
                 <h2 style="font-size: 16px!important;">{{item.monto}} BLKS ($1000)</h2>
@@ -100,7 +99,7 @@
 
             <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;">
               <span class="bold tcenter" style="color: var(--secondary); font-weight: 700!important;">Finaliza:</span> 
-              {{item.tiempo}} (hora oficial de Infinity Bloks) 
+              {{item.tiempo}}  
             </span>
         </v-card>
       </v-col>
@@ -259,7 +258,7 @@ export default {
       console.log(historialDepositos)
       console.log("-----------historialDepositos")
       console.log("antes del for")
-      for(let i = historialDepositos[0].length ; i >= historialDepositos[0].length-3; i--) {
+      for(let i = historialDepositos[0].length ; i >= historialDepositos[0].length-9; i--) {
         const monto = historialDepositos[0][i] / Math.pow(10, 18)
         const tiempo = new Date(historialDepositos[1][i] * 1000)
         const estado = historialDepositos[2][i] ? "ACTIVE" : "INACTIVE"
