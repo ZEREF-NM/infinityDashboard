@@ -37,7 +37,7 @@ export default {
   },
 
   mounted() {
-    
+    this.getChainId()
   },
 
   methods: {
@@ -68,29 +68,23 @@ export default {
     },
 
     getChainId() {
-      const chainId = window.ethereum.request({ method: 'eth_chainId' })
-
-      if (chainId !== 56) {
-        this.$alert('error', { desc: 'Agregue la red de BNB' })
+      if (window.ethereum.networkVersion !== "56") {
         this.changeUserCurrentChain()
       }
     },
 
-    changeUserCurrentChain: async () => {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x38' }]
-        })
-
-        window.location.reload()
-      } catch (switchError) {
-        if (switchError.code === 4902) {
-
-          try {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
+    async changeUserCurrentChain() {try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x38' }],
+      });
+      
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
                 {
                   chainId: '0x38',
                   chainName: 'BNB Smart Chain Mainnett',
@@ -102,12 +96,12 @@ export default {
                   }
                 }
               ]
-            })
-          } catch (err) {
-            
-          }
+          });
+        } catch (err) {
+          this.$alert('error', { desc: 'Por favor agregue la red de BNB para poder usar la dapp' })
         }
       }
+    }
     }
   }
 }

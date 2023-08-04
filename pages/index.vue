@@ -4,7 +4,7 @@
       <v-col cols="12" class="center">
         <v-card class="card" style="background-color: var(--secondary)!important;">
             <h2 class="p">WALLET</h2>
-            <span>{{wallet}}</span>
+            <span>{{ wallet }}</span>
         </v-card>
       </v-col>
 
@@ -14,7 +14,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/Bloque.svg" alt="Bloque" class="mb-2">
           <h2 class="p">{{ getBLKS() }} BLOCKS</h2>
-          <span>$1050</span>
+          <span>${{ getInvestors()}}</span>
         </v-card>
       </v-col>
       
@@ -172,7 +172,7 @@ export default {
     }
   },
   mounted() {
-    this.getAccount();
+    
     if (localStorage.getItem("wallet") !== null) {
       this.updateWallet();
     }
@@ -183,16 +183,14 @@ export default {
         .request({ method: 'eth_requestAccounts' })
         .catch((err) => {
           if (err.code === 4001) {
-            // EIP-1193 userRejectedRequest error
-            // If this happens, the user rejected the connection request.
-            console.log('Please connect to MetaMask.')
+            this.$alert('error',{desc:"Por favor conecta con metamask para poder utilizar la Dapp"})
           } else {
             console.error(err)
           }
         })
       const account = accounts[0]
       localStorage.setItem('isLogged', window.ethereum.isConnected())
-      localStorage.setItem('account', account)
+      localStorage.setItem('wallet', account)
     },
     updateWallet() {
       window.ethereum.on('accountsChanged', (accounts) => {
@@ -206,33 +204,53 @@ export default {
     },
     async getBLKS() {
       const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const blks = await tokenContract.methods.blokes().send()
-      return blks
+      try {
+        const blks = await tokenContract.methods.blokes(localStorage.getItem("wallet"), 0).call({from: localStorage.getItem("wallet")})
+        console.log(Number.isInteger(blks) ? blks : "")
+        return Number.isInteger(blks) ? blks : ""
+      } catch (error) {
+        console.log(error+"getBLKS")
+        return ""
+      }
+      
     },
+
+    async getInvestors() {
+      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      try {
+        const investors = await tokenContract.methods.investors(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
+        return investors
+      } catch (error) {
+        console.log(error+"getInvestors")
+        return 0
+      }
+      
+    },
+
     async getROI() {
       const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const ROI = await tokenContract.methods.adRoi().send()
+      const ROI = await tokenContract.methods.adRoi(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
       return ROI
     },
     async withdrawBonoResidual() {
       const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const blks = await tokenContract.methods.Withdraw().call()
-      return blks
+      const bonoResidual = await tokenContract.methods.Withdraw().call()
+      return bonoResidual
     },
     async getAdInfinity() {
       const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const blks = await tokenContract.methods.adInfinity().send()
-      return blks
+      const adInfinity = await tokenContract.methods.adInfinity().send()
+      return adInfinity
     },
     async withdrawBonoReferidos() {
       const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const blks = await tokenContract.methods.withdraw2().send()
-      return blks
+      const bonoReferidos = await tokenContract.methods.withdraw2().send()
+      return bonoReferidos
     },
     async getDepositos() {
       const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const blks = await tokenContract.methods.depositos().send()
-      return blks
+      const depositos = await tokenContract.methods.depositos().send()
+      return depositos
     },
   }
 };
