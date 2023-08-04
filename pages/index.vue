@@ -1,6 +1,6 @@
 <template>
   <div id="home" class="divcol">
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important;">
+    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; align-items: flex-start; max-height: 600px!important;">
       <v-col cols="12" class="center">
         <v-card class="card" style="background-color: var(--secondary)!important;">
             <h2 class="p">WALLET</h2>
@@ -30,7 +30,7 @@
       </v-col>
     </v-row>
 
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important;  margin-top: 0px!important;">
+    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important;">
       <v-col cols="12" class="center">
         <v-card class="card">
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
@@ -72,7 +72,7 @@
       <hr class="show-mobile">
     </v-row>
 
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: 0px!important; align-items: flex-start;">
+    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; align-items: flex-start;">
 
       <v-col 
       v-for="item in depositos"
