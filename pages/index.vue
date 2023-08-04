@@ -13,8 +13,8 @@
       <v-col cols="12" class="center">
         <v-card class="card">
           <img src="~/assets/sources/icons/Bloque.svg" alt="Bloque" class="mb-2">
-          <h2 class="p">{{ getBLKS() }} BLOCKS</h2>
-          <span>${{ getInvestors()}}</span>
+          <h2 class="p">{{ blocks }} BLOCKS</h2>
+          <span>$164</span>
         </v-card>
       </v-col>
       
@@ -24,7 +24,7 @@
         <v-card class="card" style="background-color: var(--secondary)!important;">
           <h2 class="p tcenter">BONO RESIDUAL<br>ACTIVO</h2>
           <v-sheet class="sheet-white mt-3 center">
-            <span>$250.00</span>
+            <span>${{ bonoResidualActivo }}</span>
           </v-sheet>
         </v-card>
       </v-col>
@@ -35,7 +35,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
-          <span>${{ getROI() }}</span>
+          <span>${{ roi }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -44,7 +44,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/residual.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO RESIDUAL</h2>
-          <span>$0.00</span>
+          <span>${{ bonoResidual }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -53,7 +53,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/Referido.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO REFERIDOS</h2>
-          <span>$50.00</span>
+          <span>${{ bonoReferidos }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -64,7 +64,7 @@
         <v-card class="card" style="background-color: var(--secondary)!important;">
           <h2 class="p tcenter">BONO RESIDUAL<br>ACTIVO</h2>
           <v-sheet class="sheet-white mt-3 center">
-            <span>$250.00</span>
+            <span>${{ bonoResidualActivo }}</span>
           </v-sheet>
         </v-card>
       </v-col>
@@ -152,15 +152,22 @@
 </template>
 
 <script>
-import faucetAbi from '~/static/ABIS/infinity_blocks_abi.json';
+import contractAbi from '~/static/ABIS/infinity_blocks_abi.json';
 const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
 const infinityBlocksAddres = '0x2A97A853261e6338a0663f17e81fC3d6dF9e4f41';
+const walletPruebas = '0x981374dE858078c0be8c0Bb51c4cDCe6393a7405'
 
 export default {
   name: "HomePage",
   data() {
     return {
+      loading: false,
+      roi: 0,
+      blokes: 0,
+      bonoResidualActivo: 0,
+      bonoResidual: 0,
+
       active_slider: 60,
       wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet"),
     }
@@ -172,10 +179,27 @@ export default {
     }
   },
   mounted() {
-    
+    this.getBLKS()
+    this.getROI()
+    this.getInvestors()
+    this.getAdInfinity()
+    this.getDepositos()
     if (localStorage.getItem("wallet") !== null) {
       this.updateWallet();
     }
+  },
+  created() {
+    // watch the params of the route to fetch the data again
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.getInvestors()
+        this.getBLKS()
+      },
+      // fetch the data when the view is created and the data is
+      // already being observed
+      { immediate: true }
+    )
   },
   methods: {
     async getAccount() {
@@ -203,10 +227,12 @@ export default {
       return this.$alert('error',{desc:"Su wallet ya esta conectada"})
     },
     async getBLKS() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      this.loading = true
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        const blks = await tokenContract.methods.blokes(localStorage.getItem("wallet"), 0).call({from: localStorage.getItem("wallet")})
+        const blks = await tokenContract.methods.blokes(walletPruebas, 0).call({from: walletPruebas})
         console.log(Number.isInteger(blks) ? blks : "")
+        this.loading = false
         return Number.isInteger(blks) ? blks : ""
       } catch (error) {
         console.log(error+"getBLKS")
@@ -216,9 +242,9 @@ export default {
     },
 
     async getInvestors() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        const investors = await tokenContract.methods.investors(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
+        const investors = await tokenContract.methods.investors(walletPruebas).call({from: walletPruebas})
         return investors
       } catch (error) {
         console.log(error+"getInvestors")
@@ -228,30 +254,44 @@ export default {
     },
 
     async getROI() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const ROI = await tokenContract.methods.adRoi(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
-      return ROI
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const adRoi = await tokenContract.methods.adRoi(walletPruebas).call({from: walletPruebas})
+      this.roi = adRoi
+      console.log(adRoi)
+      console.log("------------")
+
     },
+
     async withdrawBonoResidual() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const bonoResidual = await tokenContract.methods.Withdraw().call()
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const bonoResidual = await tokenContract.methods.Withdraw(walletPruebas).send({from: walletPruebas})
       return bonoResidual
     },
+
     async getAdInfinity() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const adInfinity = await tokenContract.methods.adInfinity().send()
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const adInfinity = await tokenContract.methods.adInfinity(walletPruebas).call({from: walletPruebas})
       return adInfinity
     },
+
     async withdrawBonoReferidos() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const bonoReferidos = await tokenContract.methods.withdraw2().send()
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const bonoReferidos = await tokenContract.methods.withdraw2(walletPruebas).send({from: walletPruebas})
       return bonoReferidos
     },
-    async getDepositos() {
-      const tokenContract = new web3.eth.Contract(faucetAbi, infinityBlocksAddres);
-      const depositos = await tokenContract.methods.depositos().send()
+
+    async withdrawTeam() {
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const depositos = await tokenContract.methods.withdrawTeam(walletPruebas).call({from: walletPruebas})
       return depositos
     },
+
+    async getDepositos() {
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const depositos = await tokenContract.methods.depositos(walletPruebas).call({from: walletPruebas})
+      return depositos
+    },
+    
   }
 };
 </script>
