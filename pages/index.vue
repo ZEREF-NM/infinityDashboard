@@ -4,7 +4,7 @@
       <v-col cols="12" class="center">
         <v-card class="card" style="background-color: var(--secondary)!important;">
             <h2 class="p">WALLET</h2>
-            <span>{{ wallet }}</span>
+            <span>{{ wallet }}...</span>
         </v-card>
       </v-col>
 
@@ -133,7 +133,7 @@ export default {
       bonoResidual: 0,
       active_slider: 60,
       depositos: [],
-      wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet"),
+      wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet").substring(1, 20),
     }
   },
   head() {
