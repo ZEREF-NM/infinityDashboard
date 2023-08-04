@@ -73,80 +73,6 @@
     </v-row>
 
     <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: 0px!important; align-items: flex-start;">
-      <v-col cols="12" class="center">
-        <v-card class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
-            <div class="div-blue">
-              <div class="divrow center" style="gap: 10px; max-height: 40px;">
-                <h2 style="font-size: 16px!important;">1 BLKS ($50)</h2>
-                <div class="vertical"></div>
-                <h2 style="font-size: 16px!important;">ACTIVE</h2>
-              </div>
-              <v-slider
-              v-model="active_slider"
-              color="var(--primary)"
-              thumb-label="none" 
-              hide-details 
-              class="slider"
-              readonly
-               ></v-slider>
-            </div>
-
-            <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;">
-              <span class="bold tcenter" style="color: var(--secondary); font-weight: 700!important;">Finaliza:</span> 
-               27 de Julio del 2025 - 00:02:05<br>GMT-5 (hora oficial de Infinity Bloks) 
-            </span>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" class="center">
-        <v-card class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
-            <div class="div-blue">
-              <div class="divrow center" style="gap: 10px; max-height: 40px;">
-                <h2 style="font-size: 16px!important;">$250 - RESIDUAL</h2>
-                <div class="vertical"></div>
-                <h2 style="font-size: 16px!important;">ACTIVE</h2>
-              </div>
-              <v-slider
-              v-model="active_slider"
-              color="var(--primary)"
-              thumb-label="none" 
-              hide-details 
-              class="slider"
-              readonly
-               ></v-slider>
-            </div>
-
-            <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;">
-              <span class="bold tcenter" style="color: var(--secondary); font-weight: 700!important;">Finaliza:</span> 
-               27 de Julio del 2025 - 00:02:05<br>GMT-5 (hora oficial de Infinity Bloks) 
-            </span>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" class="center">
-        <v-card class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
-            <div class="div-blue">
-              <div class="divrow center" style="gap: 10px; max-height: 40px;">
-                <h2 style="font-size: 16px!important;">20 BLKS ($1000)</h2>
-                <div class="vertical"></div>
-                <h2 style="font-size: 16px!important;">ACTIVE</h2>
-              </div>
-              <v-slider
-              v-model="active_slider"
-              color="var(--primary)"
-              thumb-label="none" 
-              hide-details 
-              class="slider"
-              readonly
-               ></v-slider>
-            </div>
-
-            <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;">
-              <span class="bold tcenter" style="color: var(--secondary); font-weight: 700!important;">Finaliza:</span> 
-               27 de Julio del 2025 - 00:02:05<br>GMT-5 (hora oficial de Infinity Bloks) 
-            </span>
-        </v-card>
-      </v-col>
 
       <v-col 
       v-for="item in depositos"
@@ -186,7 +112,7 @@ import contractAbi from '~/static/ABIS/infinity_blocks_abi.json';
 const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
 const infinityBlocksAddres = '0x2A97A853261e6338a0663f17e81fC3d6dF9e4f41';
-// const walletPruebas = '0x981374dE858078c0be8c0Bb51c4cDCe6393a7405'
+// const walletPrueba = '0x981374dE858078c0be8c0Bb51c4cDCe6393a7405'
 
 export default {
   name: "HomePage",
@@ -307,7 +233,7 @@ export default {
       try {
         await tokenContract.methods.withdraw().send({from: localStorage.getItem("wallet")})
       } catch (error) {
-        console.log(error)
+        console.log(error) 
       }
     },
 
@@ -325,16 +251,17 @@ export default {
 
     async getDepositos() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const historialDepositos = await tokenContract.methods.depositos(localStorage.getItem("wallet"), true).call({from: localStorage.getItem("wallet")})
+      const historialDepositos = await tokenContract.methods.depositos( localStorage.getItem("wallet"), true).call({from:  localStorage.getItem("wallet")})
       console.log(historialDepositos)
       console.log("-----------historialDepositos")
       console.log("antes del for")
-      for(let i = historialDepositos[0].length -5; i < historialDepositos[0].length-1; i++) {
-        const monto = historialDepositos[0][i]
+      for(let i = historialDepositos[0].length ; i >= historialDepositos[0].length-3; i--) {
+        const monto = historialDepositos[0][i] / Math.pow(10, 18)
         const tiempo = new Date(historialDepositos[1][i] * 1000)
-        const estado = historialDepositos[2][i]
+        const estado = historialDepositos[2][i] ? "ACTIVE" : "INACTIVE"
+        const data = {monto, tiempo, estado}
         console.log(monto,"monto", tiempo,"tiempo", estado,"estado","assdadasdas")
-        this.depositos.push({monto, tiempo, estado}) 
+        this.depositos.push(data);
       }
       console.log("despues del for")
       console.log(this.depositos)
