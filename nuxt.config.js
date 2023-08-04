@@ -68,6 +68,7 @@ export default {
     '~/plugins/apexchart.js',
     '~/plugins/google-maps.js',
     '~/plugins/vue-debounce.js',
+    '~/plugins/format-numbers.js',
     // services
     '~/services/near-api',
   ],

@@ -13,8 +13,8 @@
       <v-col cols="12" class="center">
         <v-card class="card">
           <img src="~/assets/sources/icons/Bloque.svg" alt="Bloque" class="mb-2">
-          <h2 class="p">{{ blocks }} BLOCKS</h2>
-          <span>$164</span>
+          <h2 class="p">{{ blocks | numericFormat(numericFormatConfig) }} BLOCKS</h2>
+          <span>${{invested | numericFormat(numericFormatConfig)}}</span>
         </v-card>
       </v-col>
       
@@ -24,7 +24,7 @@
         <v-card class="card" style="background-color: var(--secondary)!important;">
           <h2 class="p tcenter">BONO RESIDUAL<br>ACTIVO</h2>
           <v-sheet class="sheet-white mt-3 center">
-            <span>${{ bonoResidualActivo }}</span>
+            <span>${{ bonoResidualActivo | numericFormat(numericFormatConfig) }}</span>
           </v-sheet>
         </v-card>
       </v-col>
@@ -35,7 +35,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
-          <span>${{ roi }}</span>
+          <span>${{ roi | numericFormat(numericFormatConfig) }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -44,7 +44,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/residual.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO RESIDUAL</h2>
-          <span>${{ bonoResidual }}</span>
+          <span>${{ bonoResidual | numericFormat(numericFormatConfig) }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -53,7 +53,7 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/Referido.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO REFERIDOS</h2>
-          <span>${{ bonoReferidos }}</span>
+          <span>${{ bonoReferidos | numericFormat(numericFormatConfig) }}</span>
           <v-btn class="btn mt-3" @click="$store.state.isLogged == false? $store.dispatch('modalConnect') : alertConnect()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -64,7 +64,7 @@
         <v-card class="card" style="background-color: var(--secondary)!important;">
           <h2 class="p tcenter">BONO RESIDUAL<br>ACTIVO</h2>
           <v-sheet class="sheet-white mt-3 center">
-            <span>${{ bonoResidualActivo }}</span>
+            <span>${{ bonoResidualActivo | numericFormat(numericFormatConfig) }}</span>
           </v-sheet>
         </v-card>
       </v-col>
@@ -147,6 +147,36 @@
             </span>
         </v-card>
       </v-col>
+
+      <v-col 
+      v-for="item in depositos"
+      :key="item.fecha"
+      cols="12"
+      class="center"
+      >
+        <v-card class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
+            <div class="div-blue">
+              <div class="divrow center" style="gap: 10px; max-height: 40px;">
+                <h2 style="font-size: 16px!important;">{{item.monto}} BLKS ($1000)</h2>
+                <div class="vertical"></div>
+                <h2 style="font-size: 16px!important;">{{item.estado}}</h2>
+              </div>
+              <v-slider
+              v-model="active_slider"
+              color="var(--primary)"
+              thumb-label="none" 
+              hide-details 
+              class="slider"
+              readonly
+               ></v-slider>
+            </div>
+
+            <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;">
+              <span class="bold tcenter" style="color: var(--secondary); font-weight: 700!important;">Finaliza:</span> 
+              {{item.tiempo}} (hora oficial de Infinity Bloks) 
+            </span>
+        </v-card>
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -162,13 +192,21 @@ export default {
   name: "HomePage",
   data() {
     return {
-      loading: false,
+      numericFormatConfig: {
+        decimalSeparator: ".",
+        fractionDigitsMax: 2,
+        fractionDigitsMin: 2,
+        fractionDigitsSeparator: "",
+        thousandsDigitsSeparator: ","
+      },
       roi: 0,
-      blokes: 0,
+      blocks: 0,
+      invested: 0,
       bonoResidualActivo: 0,
+      bonoReferidos: 0,
       bonoResidual: 0,
-
       active_slider: 60,
+      depositos: [],
       wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet"),
     }
   },
@@ -187,19 +225,6 @@ export default {
     if (localStorage.getItem("wallet") !== null) {
       this.updateWallet();
     }
-  },
-  created() {
-    // watch the params of the route to fetch the data again
-    this.$watch(
-      () => this.$route.params,
-      () => {
-        this.getInvestors()
-        this.getBLKS()
-      },
-      // fetch the data when the view is created and the data is
-      // already being observed
-      { immediate: true }
-    )
   },
   methods: {
     async getAccount() {
@@ -232,11 +257,11 @@ export default {
       try {
         const blks = await tokenContract.methods.blokes(walletPruebas, 0).call({from: walletPruebas})
         console.log(Number.isInteger(blks) ? blks : "")
-        this.loading = false
-        return Number.isInteger(blks) ? blks : ""
+        const formatedBlks = await blks[2] / Math.pow(10, 18)
+        this.blocks = formatedBlks
       } catch (error) {
         console.log(error+"getBLKS")
-        return ""
+        this.blocks = 0
       }
       
     },
@@ -245,33 +270,44 @@ export default {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
         const investors = await tokenContract.methods.investors(walletPruebas).call({from: walletPruebas})
-        return investors
+        console.log(investors)
+        console.log("---------------------------- investors")
+        this.invested = investors.invested / Math.pow(10, 18)
+        this.bonoReferidos = investors.balanceRef / Math.pow(10, 18)
       } catch (error) {
         console.log(error+"getInvestors")
-        return 0
+        this.invested = 0
       }
       
     },
 
     async getROI() {
-      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const adRoi = await tokenContract.methods.adRoi(walletPruebas).call({from: walletPruebas})
-      this.roi = adRoi
-      console.log(adRoi)
-      console.log("------------")
-
-    },
-
-    async withdrawBonoResidual() {
-      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const bonoResidual = await tokenContract.methods.Withdraw(walletPruebas).send({from: walletPruebas})
-      return bonoResidual
+      try {
+        const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+        const adRoi = await tokenContract.methods.adRoi(walletPruebas).call({from: walletPruebas})
+        this.roi = adRoi / Math.pow(10, 18)
+      } catch (error) {
+        this.roi = 0
+      }
     },
 
     async getAdInfinity() {
+      try {
+        const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+        const adInfinity = await tokenContract.methods.adInfinity(walletPruebas).call({from: walletPruebas})
+        this.bonoResidual = adInfinity / Math.pow(10, 18)
+      } catch (error) {
+        this.bonoResidual = 0
+      }
+    },
+    
+    async withdrawBonoResidual() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const adInfinity = await tokenContract.methods.adInfinity(walletPruebas).call({from: walletPruebas})
-      return adInfinity
+      try {
+        await tokenContract.methods.Withdraw(walletPruebas).send({from: walletPruebas})
+      } catch (error) {
+        console.log(error)
+      }
     },
 
     async withdrawBonoReferidos() {
@@ -282,14 +318,26 @@ export default {
 
     async withdrawTeam() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const depositos = await tokenContract.methods.withdrawTeam(walletPruebas).call({from: walletPruebas})
+      const depositos = await tokenContract.methods.withdrawTeam(walletPruebas).send({from: walletPruebas})
       return depositos
     },
 
     async getDepositos() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const depositos = await tokenContract.methods.depositos(walletPruebas).call({from: walletPruebas})
-      return depositos
+      const historialDepositos = await tokenContract.methods.depositos(walletPruebas, true).call({from: walletPruebas})
+      console.log(historialDepositos)
+      console.log("-----------historialDepositos")
+      console.log("antes del for")
+      for(let i = historialDepositos[0].length -5; i < historialDepositos[0].length-1; i++) {
+        const monto = historialDepositos[0][i]
+        const tiempo = new Date(historialDepositos[1][i] * 1000)
+        const estado = historialDepositos[2][i]
+        console.log(monto,"monto", tiempo,"tiempo", estado,"estado","assdadasdas")
+        this.depositos.push({monto, tiempo, estado}) 
+      }
+      console.log("despues del for")
+      console.log(this.depositos)
+      console.log("-------------- depositos")
     },
     
   }
