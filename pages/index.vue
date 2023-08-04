@@ -255,7 +255,7 @@ export default {
       this.loading = true
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        const blks = await tokenContract.methods.blokes(walletPruebas, 0).call({from: walletPruebas})
+        const blks = await tokenContract.methods.blokes(localStorage.getItem("wallet"), 0).call({from: localStorage.getItem("wallet")})
         console.log(Number.isInteger(blks) ? blks : "")
         const formatedBlks = await blks[2] / Math.pow(10, 18)
         this.blocks = formatedBlks
@@ -269,7 +269,7 @@ export default {
     async getInvestors() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        const investors = await tokenContract.methods.investors(walletPruebas).call({from: walletPruebas})
+        const investors = await tokenContract.methods.investors(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
         console.log(investors)
         console.log("---------------------------- investors")
         this.invested = investors.invested / Math.pow(10, 18)
@@ -284,7 +284,7 @@ export default {
     async getROI() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const adRoi = await tokenContract.methods.adRoi(walletPruebas).call({from: walletPruebas})
+        const adRoi = await tokenContract.methods.adRoi(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
         this.roi = adRoi / Math.pow(10, 18)
       } catch (error) {
         this.roi = 0
@@ -294,7 +294,7 @@ export default {
     async getAdInfinity() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const adInfinity = await tokenContract.methods.adInfinity(walletPruebas).call({from: walletPruebas})
+        const adInfinity = await tokenContract.methods.adInfinity(localStorage.getItem("wallet")).call({from: localStorage.getItem("wallet")})
         this.bonoResidual = adInfinity / Math.pow(10, 18)
       } catch (error) {
         this.bonoResidual = 0
@@ -304,7 +304,7 @@ export default {
     async withdrawBonoResidual() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        await tokenContract.methods.Withdraw(walletPruebas).send({from: walletPruebas})
+        await tokenContract.methods.Withdraw(localStorage.getItem("wallet")).send({from: localStorage.getItem("wallet")})
       } catch (error) {
         console.log(error)
       }
@@ -312,19 +312,19 @@ export default {
 
     async withdrawBonoReferidos() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const bonoReferidos = await tokenContract.methods.withdraw2(walletPruebas).send({from: walletPruebas})
+      const bonoReferidos = await tokenContract.methods.withdraw2(localStorage.getItem("wallet")).send({from: localStorage.getItem("wallet")})
       return bonoReferidos
     },
 
     async withdrawTeam() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const depositos = await tokenContract.methods.withdrawTeam(walletPruebas).send({from: walletPruebas})
+      const depositos = await tokenContract.methods.withdrawTeam(localStorage.getItem("wallet")).send({from: localStorage.getItem("wallet")})
       return depositos
     },
 
     async getDepositos() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      const historialDepositos = await tokenContract.methods.depositos(walletPruebas, true).call({from: walletPruebas})
+      const historialDepositos = await tokenContract.methods.depositos(localStorage.getItem("wallet"), true).call({from: walletPruebas})
       console.log(historialDepositos)
       console.log("-----------historialDepositos")
       console.log("antes del for")
@@ -339,6 +339,7 @@ export default {
       console.log(this.depositos)
       console.log("-------------- depositos")
     },
+    
     
   }
 };
