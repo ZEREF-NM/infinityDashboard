@@ -75,6 +75,7 @@
     <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: 0px!important; align-items: flex-start;">
 
       <v-col 
+      v-show = "registered"
       v-for="item in depositos"
       :key="item.fecha"
       cols="12"
@@ -128,6 +129,7 @@ export default {
       roi: 0,
       blocks: 0,
       invested: 0,
+      registered: false,
       bonoResidualActivo: 0,
       bonoReferidos: 0,
       bonoResidual: 0,
@@ -201,6 +203,8 @@ export default {
         console.log("---------------------------- investors")
         this.invested = investors.invested / Math.pow(10, 18)
         this.bonoReferidos = investors.balanceRef / Math.pow(10, 18)
+        this.registered = investors.registered
+        console.log(investors.registered)
       } catch (error) {
         console.log(error+"getInvestors")
         this.invested = 0
