@@ -36,7 +36,7 @@
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
           <span>${{ roi | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @click="withdrawROI()">RETIRAR</v-btn>
+          <v-btn class="btn mt-3" @disabled="registered" @click="withdrawROI()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -45,7 +45,7 @@
           <img src="~/assets/sources/icons/residual.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO RESIDUAL</h2>
           <span>${{ bonoResidual | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @click="withdrawBonoResidual()">RETIRAR</v-btn>
+          <v-btn class="btn mt-3" @disabled="registered" @click="withdrawBonoResidual()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -54,7 +54,7 @@
           <img src="~/assets/sources/icons/Referido.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO REFERIDOS</h2>
           <span>${{ bonoReferidos | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @click="withdrawBonoReferidos()">RETIRAR</v-btn>
+          <v-btn class="btn mt-3" @disabled="registered" @click="withdrawBonoReferidos()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
