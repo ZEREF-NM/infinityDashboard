@@ -113,7 +113,7 @@ const Web3 = require('web3');
 const web3 = new Web3(window.ethereum);
 const infinityBlocksAddres = '0x2A97A853261e6338a0663f17e81fC3d6dF9e4f41';
 // const walletPrueba = '0x981374dE858078c0be8c0Bb51c4cDCe6393a7405'
-// const wallet1 = '0x6924Ff38aDFd2E93dD29c603c762650d4e5981e7'
+ const wallet1 = '0x6924Ff38aDFd2E93dD29c603c762650d4e5981e7'
 // const wallet2 = '0x11907e222f22b659f9F2192d2aAF1c26bDeAc2DB'
 const precioBLKS = 50
 
@@ -258,33 +258,41 @@ export default {
 
     },
 
+    addDaysToDate(date, days){
+      const res = date;
+      res.setDate(res.getDate() + days);
+      return res;
+    },
+
     async getDepositos() {
       const diasFinalizacion = 900 
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const depositos = await tokenContract.methods.depositos( localStorage.getItem('wallet'), false).call({from:  localStorage.getItem('wallet')})
-        const depositosInfinit = await tokenContract.methods.depositos( localStorage.getItem('wallet'), true).call({from:  localStorage.getItem('wallet')})
+        const depositos = await tokenContract.methods.depositos( wallet1, false).call({from:  wallet1})
+        const depositosInfinit = await tokenContract.methods.depositos( wallet1, true).call({from:  wallet1})
 
         for(let i = 0 ; i < depositos[0].length; i++) {
           const monto = depositos[0][i] / Math.pow(10, 18)
-          const fechaFinalizacion = new Date(depositos[1][i] * 1000)
+          const fechaInicio = new Date(depositos[1][i] * 1000)
+          const fechaFinalizacion = this.addDaysToDate(fechaInicio, diasFinalizacion)
           const estado = depositos[2][i] ? "ACTIVE" : "INACTIVE"
           const data = {monto, fechaFinalizacion, estado}
           this.depositos.push(data)
+          console.log("-----fecha-----")
+          console.log(this.addDaysToDate(fechaInicio, 900))
+          console.log("----------")
         }
         for(let i = 0 ; i < depositosInfinit[0].length; i++) {
           const monto = depositosInfinit[0][i] / Math.pow(10, 18)
-          const fechaFinalizacion = new Date(depositosInfinit[1][i] * 1000)
+          const fechaInicio = new Date(depositosInfinit[1][i] * 1000)
+          const fechaFinalizacion = this.addDaysToDate(fechaInicio, diasFinalizacion)
           const estado = depositosInfinit[2][i] ? "ACTIVE" : "INACTIVE"
           const data = {monto, fechaFinalizacion, estado}
           this.depositos.push(data)
+          console.log("-----fecha-----")
+          console.log(this.addDaysToDate(fechaInicio, 900))
+          console.log("----------") 
         }
-        console.log("-----depositos-----")
-        console.log(this.depositos)
-        console.log("----------")
-        this.depositos.sort((a, b) => a.fechaFinalizacion > b.fechaFinalizacion)
-        console.log("----sorted-----")
-        console.log("----------")
       } catch (error) {
         console.log(error)
       }
