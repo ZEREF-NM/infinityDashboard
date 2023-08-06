@@ -1,10 +1,11 @@
 <template>
   <div id="home" class="divcol">
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; align-items: flex-start; max-height: 600px!important;">
+    <v-row class="center"
+      style="max-width: 500px!important; min-width: 320px!important; align-items: flex-start; max-height: 600px!important;">
       <v-col cols="12" class="center">
         <v-card class="card" style="background-color: var(--secondary)!important;">
-            <h2 class="p">WALLET</h2>
-            <span class="wallet-text">{{ wallet }}</span>
+          <h2 class="p">WALLET</h2>
+          <span class="wallet-text">{{ wallet }}</span>
         </v-card>
       </v-col>
 
@@ -13,11 +14,17 @@
       <v-col cols="12" class="center">
         <v-card class="card">
           <img src="~/assets/sources/icons/Bloque.svg" alt="Bloque" class="mb-2">
-          <h2 class="p">{{ blocks }} BLOCKS</h2>
-          <span>${{invested | numericFormat(numericFormatConfig)}}</span>
+          <h2 class="p">{{ blocks }} BLKS</h2>
+          <span>${{ invested | numericFormat({
+        decimalSeparator: ".",
+        fractionDigitsMax: 0,
+        fractionDigitsMin: 0,
+        fractionDigitsSeparator: "",
+        thousandsDigitsSeparator: ","
+      }) }}</span>
         </v-card>
       </v-col>
-      
+
       <hr class="delete-mobile">
 
       <v-col cols="12" class="center delete-mobile">
@@ -30,7 +37,8 @@
       </v-col>
     </v-row>
 
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; max-height: 740px;">
+    <v-row class="center"
+      style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; max-height: 740px;">
       <v-col cols="12" class="center">
         <v-card class="card" style="max-height: 215px!important;">
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
@@ -44,7 +52,13 @@
         <v-card class="card">
           <img src="~/assets/sources/icons/residual.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO RESIDUAL</h2>
-          <span>${{ bonoResidual | numericFormat(numericFormatConfig) }}</span>
+          <span>${{ bonoResidual | numericFormat({
+            decimalSeparator: ".",
+            fractionDigitsMax: 3,
+            fractionDigitsMin: 0,
+            fractionDigitsSeparator: "",
+            thousandsDigitsSeparator: ","
+          }) }}</span>
           <v-btn v-show="!test" class="btn mt-3" @disabled="registered" @click="withdrawBonoResidual()">RETIRAR</v-btn>
         </v-card>
       </v-col>
@@ -72,36 +86,26 @@
       <hr class="show-mobile">
     </v-row>
 
-    <v-row class="center" style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; align-items: flex-start;">
+    <v-row class="center"
+      style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; align-items: flex-start;">
 
-      <v-col 
-      v-for="(item, index) in depositos"
-      :key="index"
-      cols="12"
-      class="center"
-      >
-        <v-card v-show="item.monto" class="card" style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
-            <div class="div-blue">
-              <div class="divrow center" style="gap: 10px; max-height: 40px;">
-                <h2 style="font-size: 16px!important;">{{ item.monto | numericFormat(numericFormatConfig) }} {{ item.desc }}</h2>
-                <div class="vertical"></div>
-                <h2 style="font-size: 16px!important;">{{ item.estado }}</h2>
-              </div>
-              <v-slider
-              v-model="item.progreso"
-              min = "0"
-              max = "100"
-              color="var(--primary)"
-              hide-details 
-              class="slider"
-              readonly
-               ></v-slider>
+      <v-col v-for="(item, index) in depositos" :key="index" cols="12" class="center">
+        <v-card v-show="item.monto" class="card"
+          style="background-color: var(--tertiary)!important; padding-block: 10px!important;">
+          <div class="div-blue">
+            <div class="divrow center" style="gap: 10px; max-height: 40px;">
+              <h2 style="font-size: 16px!important;">{{ item.monto | numericFormat(numericFormatConfig) }} {{ item.desc }}
+              </h2>
+              <div class="vertical"></div>
+              <h2 style="font-size: 16px!important;">{{ item.estado }}</h2>
             </div>
+            <v-slider v-model="item.progreso" min="0" max="100" color="var(--primary)" hide-details class="slider"
+              readonly></v-slider>
+          </div>
 
-            <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;">
-              <span class="bold tcenter" style="color: var(--secondary); font-weight: 700!important;">Finaliza:</span> 
-              {{item.fechaFinalizacion}}  
-            </span>
+          <span class="tcenter mt-2" style="color: var(--secondary); font-size: 14px!important;"
+          v-html="`<span class='bold tcenter' style='color: var(--secondary); font-weight: 700!important;'>Finaliza: </span>${ item.stringFecha }`">
+        </span>  
         </v-card>
       </v-col>
     </v-row>
@@ -126,7 +130,7 @@ export default {
       numericFormatConfig: {
         decimalSeparator: ".",
         fractionDigitsMax: 2,
-        fractionDigitsMin: 0,
+        fractionDigitsMin: 2,
         fractionDigitsSeparator: "",
         thousandsDigitsSeparator: ","
       },
@@ -151,12 +155,13 @@ export default {
     }
   },
   mounted() {
-    if(this.$route.query.view) {
+    if (this.$route.query.view) {
       this.wallet = this.$route.query.view
       this.test = true
-    }else if(localStorage.getItem("wallet") !== null) {
+    } else if (localStorage.getItem("wallet") !== null) {
       this.wallet = localStorage.getItem("wallet")
     }
+    this.today = this.convertEpochToOficialTimezone(Date.now())
     this.getAccount()
     this.getROI()
     this.getUserData()
@@ -172,14 +177,14 @@ export default {
         .request({ method: 'eth_requestAccounts' })
         .catch((err) => {
           if (err.code === 4001) {
-            this.$alert('error',{desc:"Por favor conecta con metamask para poder utilizar la Dapp"})
+            this.$alert('error', { desc: "Por favor conecta con metamask para poder utilizar la Dapp" })
           } else {
             console.error(err)
           }
         })
       const account = accounts[0]
       localStorage.setItem('isLogged', window.ethereum.isConnected())
-      if(localStorage.getItem('wallet') !== account){
+      if (localStorage.getItem('wallet') !== account) {
         localStorage.setItem('wallet', account)
         window.location.reload();
       }
@@ -192,31 +197,31 @@ export default {
         window.location.reload();
       });
     },
-    alertConnect(){
-      return this.$alert('error',{desc:"Su wallet ya esta conectada"})
+    alertConnect() {
+      return this.$alert('error', { desc: "Su wallet ya esta conectada" })
     },
 
     async getUserData() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-      
+
       try {
-        const user = await tokenContract.methods.investors(this.wallet).call({from: this.wallet})
+        const user = await tokenContract.methods.investors(this.wallet).call({ from: this.wallet })
         this.invested = user.invested / Math.pow(10, 18)
         this.blocks = this.invested / precioBLKS
         this.bonoResidual = user.balanceInfinit
         this.bonoReferidos = user.balanceRef / Math.pow(10, 18)
         this.registered = user.registered
       } catch (error) {
-        console.log(error+"getUserData")
+        console.log(error + "getUserData")
         this.invested = 0
       }
-      
+
     },
 
     async getROI() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const roi = await tokenContract.methods.withdrawable(this.wallet, false).call({from: this.wallet})
+        const roi = await tokenContract.methods.withdrawable(this.wallet, false).call({ from: this.wallet })
         this.roi = roi / Math.pow(10, 18)
       } catch (error) {
         this.roi = 0
@@ -226,26 +231,26 @@ export default {
     async getBonoResidual() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const bonoResidual = await tokenContract.methods.withdrawable(this.wallet, true).call({from: this.wallet})
+        const bonoResidual = await tokenContract.methods.withdrawable(this.wallet, true).call({ from: this.wallet })
         this.bonoResidual = bonoResidual / Math.pow(10, 18)
       } catch (error) {
         this.bonoResidual = 0
       }
     },
-    
+
     async withdrawROI() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        await tokenContract.methods.withdraw().send({from: this.wallet})
+        await tokenContract.methods.withdraw().send({ from: this.wallet })
       } catch (error) {
-        console.log(error) 
+        console.log(error)
       }
     },
 
     async withdrawBonoResidual() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        await tokenContract.methods.withdraw2().send({from: this.wallet})
+        await tokenContract.methods.withdraw2().send({ from: this.wallet })
       } catch (error) {
         console.log(error)
       }
@@ -254,7 +259,7 @@ export default {
     async withdrawReferidos() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        await tokenContract.methods.withdrawTeam().send({from: this.wallet})
+        await tokenContract.methods.withdrawTeam().send({ from: this.wallet })
       } catch (error) {
         console.log(error)
       }
@@ -267,51 +272,73 @@ export default {
       return result;
     },
 
-    diferenciaDias(date1, date2){
+    diferenciaDias(date1, date2) {
       const difference = date1.getTime() - date2.getTime();
       const TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
       return TotalDays;
     },
 
+    convertEpochToOficialTimezone(timeEpoch) {
+      const offset = -5
+      const d = new Date(timeEpoch * 1000);
+      const utc = d.getTime() + (d.getTimezoneOffset() * 60000);  // This converts to UTC 00:00
+      const nd = new Date(utc + (3600000*offset));
+      //  console.log("-----------")
+      //  console.log(d+"d")
+      //  console.log(nd+"nd")
+      //  console.log(nd.toLocaleString()+"nd")
+      //  console.log("-----------")
+      return nd;
+    },
+
     async getDepositos() {
       const diasFinalizacion = 900
+      let montoTotalInfinit = 0
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const depositos = await tokenContract.methods.depositos( this.wallet, false).call({from:  this.wallet})
-        const depositosInfinit = await tokenContract.methods.depositos( this.wallet, true).call({from:  this.wallet})
+        const depositos = await tokenContract.methods.depositos(this.wallet, false).call({ from: this.wallet })
+        const depositosInfinit = await tokenContract.methods.depositos(this.wallet, true).call({ from: this.wallet })
 
-        for(let i = 0 ; i < depositos[0].length; i++) {
-          const monto = depositos[0][i] / Math.pow(10, 18)
-          const desc = " BLKS ($"+ precioBLKS * monto +")"
-          const fechaInicio = new Date(depositos[1][i] * 1000)
+        for (let i = 0; i < depositos[0].length; i++) {
+          const monto = (depositos[0][i] / Math.pow(10, 18)) / 120
+          const desc = " BLKS ($" + precioBLKS * monto + ")"
+          const fechaInicio = this.convertEpochToOficialTimezone(depositos[1][i])
           const epoch = depositos[1][i]
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
           const progreso = calProgreso > 100 ? 100 : calProgreso
+          const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
           const infinit = depositosInfinit[2][i]
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
-          const data = {monto, fechaFinalizacion, estado, progreso, fechaInicio, infinit, desc, epoch}
+          const data = { monto, stringFecha, estado, progreso, fechaInicio, infinit, desc, epoch }
           this.depositos.push(data)
         }
-        for(let i = 0 ; i < depositosInfinit[0].length; i++) {
+        for (let i = 0; i < depositosInfinit[0].length; i++) {
           const monto = depositosInfinit[0][i] / Math.pow(10, 18)
           const desc = "USD | infinity "
-          const fechaInicio = new Date(depositosInfinit[1][i] * 1000)
+          const fechaInicio = this.convertEpochToOficialTimezone(depositosInfinit[1][i])
           const epoch = depositosInfinit[1][i]
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
           const progreso = calProgreso > 100 ? 100 : calProgreso
+          const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
           const infinit = depositosInfinit[2][i]
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
-          const data = {monto, fechaFinalizacion, estado, progreso, fechaInicio, infinit, desc, epoch}
+          const data = { monto, stringFecha, estado, progreso, fechaInicio, infinit, desc, epoch }
+          montoTotalInfinit += monto
           this.depositos.push(data)
         }
         this.depositos = this.depositos.sort((a, b) => a.epoch - b.epoch)
+        this.bonoResidualActivo = montoTotalInfinit
       } catch (error) {
         console.log(error)
       }
     },
-    
+
+    getBonoResidualActivo() {
+
+    }
+
   }
 };
 </script>
