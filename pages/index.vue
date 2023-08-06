@@ -36,7 +36,7 @@
           <img src="~/assets/sources/icons/roi.svg" alt="Bloque" class="mb-2">
           <h2 class="p">RET. DE INVERSION</h2>
           <span>${{ roi | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @disabled="registered" @click="withdrawROI()">RETIRAR</v-btn>
+          <v-btn v-show="!test" class="btn mt-3" @disabled="registered" @click="withdrawROI()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -45,7 +45,7 @@
           <img src="~/assets/sources/icons/residual.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO RESIDUAL</h2>
           <span>${{ bonoResidual | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @disabled="registered" @click="withdrawBonoResidual()">RETIRAR</v-btn>
+          <v-btn v-show="!test" class="btn mt-3" @disabled="registered" @click="withdrawBonoResidual()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -54,7 +54,7 @@
           <img src="~/assets/sources/icons/Referido.svg" alt="Bloque" class="mb-2">
           <h2 class="p">BONO REFERIDOS</h2>
           <span>${{ bonoReferidos | numericFormat(numericFormatConfig) }}</span>
-          <v-btn class="btn mt-3" @disabled="registered" @click="withdrawReferidos()">RETIRAR</v-btn>
+          <v-btn v-show="!test" class="btn mt-3" @disabled="registered" @click="withdrawReferidos()">RETIRAR</v-btn>
         </v-card>
       </v-col>
 
@@ -140,7 +140,8 @@ export default {
       active_slider: 60,
       valorBLKS: 0,
       depositos: [],
-      wallet: localStorage.getItem("wallet") === null ? "": localStorage.getItem("wallet").substring(1, 20),
+      wallet: "",
+      test: false,
     }
   },
   head() {
@@ -150,6 +151,12 @@ export default {
     }
   },
   mounted() {
+    if(this.$route.query.view) {
+      this.wallet = this.$route.query.view
+      this.test = true
+    }else if(localStorage.getItem("wallet") !== null) {
+      this.wallet = localStorage.getItem("wallet")
+    }
     this.getAccount()
     this.getROI()
     this.getUserData()
@@ -193,7 +200,7 @@ export default {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       
       try {
-        const user = await tokenContract.methods.investors(localStorage.getItem('wallet')).call({from: localStorage.getItem('wallet')})
+        const user = await tokenContract.methods.investors(this.wallet).call({from: this.wallet})
         this.invested = user.invested / Math.pow(10, 18)
         this.blocks = this.invested / precioBLKS
         this.bonoResidual = user.balanceInfinit
@@ -209,7 +216,7 @@ export default {
     async getROI() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const roi = await tokenContract.methods.withdrawable(localStorage.getItem('wallet'), false).call({from: localStorage.getItem('wallet')})
+        const roi = await tokenContract.methods.withdrawable(this.wallet, false).call({from: this.wallet})
         this.roi = roi / Math.pow(10, 18)
       } catch (error) {
         this.roi = 0
@@ -219,7 +226,7 @@ export default {
     async getBonoResidual() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const bonoResidual = await tokenContract.methods.withdrawable(localStorage.getItem('wallet'), true).call({from: localStorage.getItem('wallet')})
+        const bonoResidual = await tokenContract.methods.withdrawable(this.wallet, true).call({from: this.wallet})
         this.bonoResidual = bonoResidual / Math.pow(10, 18)
       } catch (error) {
         this.bonoResidual = 0
@@ -229,7 +236,7 @@ export default {
     async withdrawROI() {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       try {
-        await tokenContract.methods.withdraw().send({from: localStorage.getItem('wallet')})
+        await tokenContract.methods.withdraw().send({from: this.wallet})
       } catch (error) {
         console.log(error) 
       }
@@ -238,7 +245,7 @@ export default {
     async withdrawBonoResidual() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        await tokenContract.methods.withdraw2().send({from: localStorage.getItem('wallet')})
+        await tokenContract.methods.withdraw2().send({from: this.wallet})
       } catch (error) {
         console.log(error)
       }
@@ -247,7 +254,7 @@ export default {
     async withdrawReferidos() {
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        await tokenContract.methods.withdrawTeam().send({from: localStorage.getItem('wallet')})
+        await tokenContract.methods.withdrawTeam().send({from: this.wallet})
       } catch (error) {
         console.log(error)
       }
@@ -270,8 +277,8 @@ export default {
       const diasFinalizacion = 900
       try {
         const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const depositos = await tokenContract.methods.depositos( localStorage.getItem('wallet'), false).call({from:  localStorage.getItem('wallet')})
-        const depositosInfinit = await tokenContract.methods.depositos( localStorage.getItem('wallet'), true).call({from:  localStorage.getItem('wallet')})
+        const depositos = await tokenContract.methods.depositos( this.wallet, false).call({from:  this.wallet})
+        const depositosInfinit = await tokenContract.methods.depositos( this.wallet, true).call({from:  this.wallet})
 
         for(let i = 0 ; i < depositos[0].length; i++) {
           const monto = depositos[0][i] / Math.pow(10, 18)
