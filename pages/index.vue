@@ -4,7 +4,7 @@
       <v-col cols="12" class="center">
         <v-card class="card" style="background-color: var(--secondary)!important;">
             <h2 class="p">WALLET</h2>
-            <span>{{ wallet }}...</span>
+            <span class="wallet-text">{{ wallet }}</span>
         </v-card>
       </v-col>
 
