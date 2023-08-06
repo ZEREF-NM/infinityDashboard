@@ -312,6 +312,7 @@ export default {
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
           const data = { monto, stringFecha, estado, progreso, fechaInicio, infinit, desc, epoch }
           this.depositos.push(data)
+          
         }
         for (let i = 0; i < depositosInfinit[0].length; i++) {
           const monto = depositosInfinit[0][i] / Math.pow(10, 18)
@@ -329,6 +330,7 @@ export default {
           this.depositos.push(data)
         }
         this.depositos = this.depositos.sort((a, b) => a.epoch - b.epoch)
+        this.depositros = this.depositos.reverse()
         this.bonoResidualActivo = montoTotalInfinit
       } catch (error) {
         console.log(error)
