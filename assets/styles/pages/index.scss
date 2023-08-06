@@ -18,7 +18,7 @@
     justify-content: center!important;
     align-items: center!important;
     padding-inline: 20px;
-    padding-bottom: 50px;
+    padding-bottom: 250px;
   }
 
   .delete-mobile{
@@ -47,6 +47,13 @@
     --fw: 300;
     font-family: var(--font1)!important;
     font-size: 16px!important;
+  }
+
+  .wallet-text{
+    @include media(max, 960px){
+      margin-top: 10px;
+      font-size: 11px!important;
+    }
   }
 
   hr{
