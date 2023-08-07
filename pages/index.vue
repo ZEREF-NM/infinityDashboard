@@ -161,17 +161,19 @@ export default {
     } else if (localStorage.getItem("wallet") !== null) {
       this.wallet = localStorage.getItem("wallet")
     }
-    this.today = this.convertEpochToOficialTimezone(Date.now())
+
     this.getAccount()
-    this.getROI()
-    this.getUserData()
-    this.getBonoResidual()
-    this.getDepositos()
+    this.updateData()
     if (localStorage.getItem("wallet") !== null) {
       this.updateWallet();
     }
   },
   methods: {
+
+    todayIs(){
+      this.today = this.convertEpochToOficialTimezone(Date.now())
+    },
+
     async getAccount() {
       const accounts = await window.ethereum
         .request({ method: 'eth_requestAccounts' })
@@ -196,9 +198,6 @@ export default {
         currentAddress === undefined ? localStorage.removeItem("wallet") : localStorage.setItem("wallet", currentAddress);
         window.location.reload();
       });
-    },
-    alertConnect() {
-      return this.$alert('error', { desc: "Su wallet ya esta conectada" })
     },
 
     async getUserData() {
@@ -283,62 +282,88 @@ export default {
       const d = new Date(timeEpoch * 1000);
       const utc = d.getTime() + (d.getTimezoneOffset() * 60000);  // This converts to UTC 00:00
       const nd = new Date(utc + (3600000*offset));
-      //  console.log("-----------")
-      //  console.log(d+"d")
-      //  console.log(nd+"nd")
-      //  console.log(nd.toLocaleString()+"nd")
-      //  console.log("-----------")
       return nd;
     },
 
-    async getDepositos() {
-      const diasFinalizacion = 900
-      let montoTotalInfinit = 0
+    async getDepositosBLKS(diasFinalizacion) {
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      const response = await tokenContract.methods.depositos(this.wallet, false).call({ from: this.wallet })
+      let depositosBLKS = []
       try {
-        const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
-        const depositos = await tokenContract.methods.depositos(this.wallet, false).call({ from: this.wallet })
-        const depositosInfinit = await tokenContract.methods.depositos(this.wallet, true).call({ from: this.wallet })
-
-        for (let i = 0; i < depositos[0].length; i++) {
-          const monto = (depositos[0][i] / Math.pow(10, 18)) / 120
+        for (let i = 0; i < response[0].length; i++) {
+          const monto = (response[0][i] / Math.pow(10, 18)) / 120
           const desc = " BLKS ($" + precioBLKS * monto + ")"
-          const fechaInicio = this.convertEpochToOficialTimezone(depositos[1][i])
-          const epoch = depositos[1][i]
+          const fechaInicio = this.convertEpochToOficialTimezone(response[1][i])
+          const epoch = response[1][i]
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
           const progreso = calProgreso > 100 ? 100 : calProgreso
           const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
-          const infinit = depositosInfinit[2][i]
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
-          const data = { monto, stringFecha, estado, progreso, fechaInicio, infinit, desc, epoch }
-          this.depositos.push(data)
-          
+          const data = { monto, stringFecha, estado, progreso, fechaInicio, desc, epoch }
+          depositosBLKS.push(data)
         }
-        for (let i = 0; i < depositosInfinit[0].length; i++) {
-          const monto = depositosInfinit[0][i] / Math.pow(10, 18)
-          const desc = "USD | infinity "
-          const fechaInicio = this.convertEpochToOficialTimezone(depositosInfinit[1][i])
-          const epoch = depositosInfinit[1][i]
-          const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
-          const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
-          const progreso = calProgreso > 100 ? 100 : calProgreso
-          const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
-          const infinit = depositosInfinit[2][i]
-          const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
-          const data = { monto, stringFecha, estado, progreso, fechaInicio, infinit, desc, epoch }
-          montoTotalInfinit += monto
-          this.depositos.push(data)
-        }
-        this.depositos = this.depositos.sort((a, b) => a.epoch - b.epoch)
-        this.depositros = this.depositos.reverse()
-        this.bonoResidualActivo = montoTotalInfinit
+        depositosBLKS = depositosBLKS.sort((a, b) => a.epoch - b.epoch)
+        depositosBLKS.reverse()
+
+        return depositosBLKS
       } catch (error) {
+        console.log(error)
+        return []
+      }
+    },
+    async getDepositosInfinity(diasFinalizacion) {
+      const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
+      let montoTotalInfinit = 0
+      const depositosInfinity = []
+      
+      try {
+        const response = await tokenContract.methods.depositos(this.wallet, true).call({ from: this.wallet })
+        for (let i = 0; i < response[0].length; i++) {
+          const monto = response[0][i] / Math.pow(10, 18)
+          const desc = "USD | infinity "
+          const fechaInicio = this.convertEpochToOficialTimezone(response[1][i])
+          const epoch = response[1][i]
+          const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
+          const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
+          const progreso = calProgreso > 100 ? 100 : calProgreso
+          const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
+          const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
+          const data = { monto, stringFecha, estado, progreso, fechaInicio, desc, epoch }
+          montoTotalInfinit += monto
+          depositosInfinity.push(data)
+        }
+      this.bonoResidualActivo = montoTotalInfinit > 0 ? montoTotalInfinit : this.bonoResidualActivo
+      depositosInfinity.sort((a, b) => a.epoch - b.epoch)
+      depositosInfinity.reverse()
+      return depositosInfinity  
+      } catch (error) {
+        console.log(error)
+        return []
+      }
+    },
+
+    async getDepositos() {
+      const diasFinalizacion = 900      
+      try {
+        const depositosBLKS = await this.getDepositosBLKS(diasFinalizacion)
+        const depositosInfinity = await this.getDepositosInfinity(diasFinalizacion)
+        this.depositos.push(...depositosBLKS, ...depositosInfinity)
+      } catch(error) {
         console.log(error)
       }
     },
 
-    getBonoResidualActivo() {
 
+
+    updateData() {
+      setInterval(() => {
+        this.todayIs()
+        this.getROI()
+        this.getUserData()
+        this.getBonoResidual()
+        this.getDepositos()
+      }, (5000));
     }
 
   }
