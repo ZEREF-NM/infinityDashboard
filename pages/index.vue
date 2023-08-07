@@ -130,7 +130,7 @@ export default {
       numericFormatConfig: {
         decimalSeparator: ".",
         fractionDigitsMax: 2,
-        fractionDigitsMin: 2,
+        fractionDigitsMin: 0,
         fractionDigitsSeparator: "",
         thousandsDigitsSeparator: ","
       },
@@ -353,8 +353,6 @@ export default {
       }
     },
 
-
-
     updateData() {
       setInterval(() => {
         this.todayIs()
@@ -362,8 +360,8 @@ export default {
         this.getUserData()
         this.getBonoResidual()
         this.getDepositos()
-      }, (5000));
-    }
+      }, (10000));
+    },
 
   }
 };
