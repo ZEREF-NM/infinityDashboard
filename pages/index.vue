@@ -207,7 +207,6 @@ export default {
         const user = await tokenContract.methods.investors(this.wallet).call({ from: this.wallet })
         this.invested = user.invested / Math.pow(10, 18)
         this.blocks = this.invested / precioBLKS
-        this.bonoResidual = user.balanceInfinit
         this.bonoReferidos = user.balanceRef / Math.pow(10, 18)
         this.registered = user.registered
       } catch (error) {
