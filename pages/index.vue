@@ -37,7 +37,7 @@
       </v-col>
     </v-row>
 
-    <hr class="delete-mobile">
+    
 
     <v-row class="center"
       style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; max-height: 740px;">
