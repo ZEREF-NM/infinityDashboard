@@ -26,6 +26,7 @@ export default {
     ],
     link: [
       // <-- icons-default -->
+      { rel: 'icon', type: 'image/icon', href: 'favicon.ico' },
       { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons' },
       // <!-- fonts -->
@@ -164,7 +165,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    publicPath: development ? '/infinity-blocks-dashboard/' : '/infinity-blocks-dashboard/',
+    publicPath: development ? '/infinity-blocks-dashboard/' : '/',
     // TODO: read about this to fix it.
     // plugins: [
     //   new webpack.ProvidePlugin({
