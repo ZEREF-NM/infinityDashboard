@@ -14,7 +14,12 @@
       <v-col cols="12" class="center">
         <v-card class="card">
           <img src="~/assets/sources/icons/Bloque.svg" alt="Bloque" class="mb-2">
-          <h2 class="p">{{ blocks }} BLKS</h2>
+          <h2 class="p">{{ blocks | numericFormat({
+        decimalSeparator: ".",
+        fractionDigitsMax: 0,
+        fractionDigitsSeparator: "",
+        thousandsDigitsSeparator: ","
+      }) }} BLKS</h2>
           <span>${{ invested | numericFormat({
         decimalSeparator: ".",
         fractionDigitsMax: 0,
