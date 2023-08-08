@@ -296,14 +296,14 @@ export default {
           const epoch = response[1][i]
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
-          if(calProgreso >= 100){
-            continue
+          if(calProgreso < 100){
+            depositosBLKS.push(data)
           }
           const progreso = calProgreso > 100 ? 100 : calProgreso
           const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
           const data = { monto, stringFecha, estado, progreso, fechaInicio, desc, epoch }
-          depositosBLKS.push(data)
+          
         }
         depositosBLKS = depositosBLKS.sort((a, b) => a.epoch - b.epoch)
         depositosBLKS.reverse()
@@ -314,6 +314,7 @@ export default {
         return []
       }
     },
+    
     async getDepositosInfinity(diasFinalizacion) {
       const tokenContract = new web3.eth.Contract(contractAbi, infinityBlocksAddres);
       let montoTotalInfinit = 0
@@ -328,14 +329,14 @@ export default {
           const epoch = response[1][i]
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
-          if(calProgreso >= 100){
-            continue
+          if(calProgreso < 100){
+            montoTotalInfinit += monto
           }
           const progreso = calProgreso > 100 ? 100 : calProgreso
           const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
           const data = { monto, stringFecha, estado, progreso, fechaInicio, desc, epoch }
-          montoTotalInfinit += monto
+          
           depositosInfinity.push(data)
         }
       this.bonoResidualActivo = montoTotalInfinit > 0 ? montoTotalInfinit : this.bonoResidualActivo
