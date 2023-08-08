@@ -154,7 +154,7 @@ export default {
 
   // Router property -  https://nuxtjs.org/docs/2.x/features/file-system-routing#the-router-property
   router: {
-    base: development ? '/infinity-blocks/' : '/infinity-blocks-dashboard/',
+    base: development ? '/infinity-blocks/' : '/',
     // middleware: ['route-validator'],
   },
 

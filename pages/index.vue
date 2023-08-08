@@ -37,6 +37,8 @@
       </v-col>
     </v-row>
 
+    <hr class="delete-mobile">
+
     <v-row class="center"
       style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; max-height: 740px;">
       <v-col cols="12" class="center">
@@ -87,7 +89,7 @@
     </v-row>
 
     <v-row class="center"
-      style="max-width: 500px!important; min-width: 320px!important; margin-top: -13px!important; align-items: flex-start;">
+      style="max-width: 500px!important; min-width: 320px!important; margin-top: 60px!important; align-items: flex-start;">
 
       <v-col v-for="(item, index) in depositos" :key="index" cols="12" class="center">
         <v-card v-show="item.monto" class="card"
