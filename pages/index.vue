@@ -304,7 +304,7 @@ export default {
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
           const progreso = calProgreso > 100 ? 100 : calProgreso
-          const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
+          const stringFecha = fechaFinalizacion.toLocaleString() + " GMT -5 <br> (Hora oficial Infinity Blocks)"
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
           const data = { monto, stringFecha, estado, progreso, fechaInicio, desc, epoch }
           
@@ -334,7 +334,7 @@ export default {
           const fechaFinalizacion = this.addDays(fechaInicio, diasFinalizacion)
           const calProgreso = (this.diferenciaDias(today, fechaInicio) / diasFinalizacion) * 100
           const progreso = calProgreso > 100 ? 100 : calProgreso
-          const stringFecha = fechaFinalizacion.toLocaleString() + " GTM -5 <br> (Hora oficial Infinity Blocks)"
+          const stringFecha = fechaFinalizacion.toLocaleString() + " GMT -5 <br> (Hora oficial Infinity Blocks)"
           const estado = progreso < 100 ? "ACTIVE" : "INACTIVE"
           const data = { monto, stringFecha, estado, progreso, fechaInicio, desc, epoch }
           
