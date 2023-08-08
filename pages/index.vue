@@ -89,7 +89,7 @@
     </v-row>
 
     <v-row class="center"
-      style="max-width: 500px!important; min-width: 320px!important; margin-top: 60px!important; align-items: flex-start;">
+      style="max-width: 500px!important; min-width: 320px!important; margin-top: 70px!important; align-items: flex-start;">
 
       <v-col v-for="(item, index) in depositos" :key="index" cols="12" class="center">
         <v-card v-show="item.monto" class="card"
