@@ -347,6 +347,7 @@ export default {
       try {
         const depositosBLKS = await this.getDepositosBLKS(diasFinalizacion)
         const depositosInfinity = await this.getDepositosInfinity(diasFinalizacion)
+        this.depositos.length = 0
         this.depositos.push(...depositosBLKS, ...depositosInfinity)
       } catch(error) {
         console.log(error)

@@ -164,7 +164,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    publicPath: development ? '/infinity-blocks-dashboard/' : '/infinity-blocks-dashboard/',
+    publicPath: development ? '/' : '/',
     // TODO: read about this to fix it.
     // plugins: [
     //   new webpack.ProvidePlugin({
